@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-duplicate-props */
 import {getInterviewById} from "@/lib/actions/general.action";
 import {redirect} from "next/navigation";
 import Image from "next/image";
@@ -30,8 +29,8 @@ const Page = async ({ params }: RouteParams) => {
             </div>
 
             <Agent
-                userName={user?.name}
-                type={user?.id}
+                userName={user?.name || ''}
+                userId={user?.id}
                 interviewId={id}
                 type="interview"
                 questions={interview.questions}
