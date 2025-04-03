@@ -32,5 +32,8 @@
     "editor.suggest.showFolders": true,
     "editor.suggest.showTypeParameters": true,
     "editor.suggest.showIssues": true,
-    "editor.parameterHints.enabled": true
+    "editor.parameterHints.enabled": true,
+    "cSpell.words": [
+        "vapi"
+    ]
 }
