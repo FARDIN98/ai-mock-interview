@@ -1,3 +1,9 @@
+/**
+ * AuthForm Component
+ * 
+ * Client-side component that handles user authentication (sign-in and sign-up)
+ * Uses React Hook Form with Zod validation and Firebase Authentication
+ */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +25,11 @@ import { auth } from "@/firebase/client";
 import { signUp, signIn } from "@/lib/actions/auth.action";
 
 
+/**
+ * Dynamic schema generator for authentication forms
+ * @param type - Form type ('sign-up' or 'sign-in')
+ * @returns Zod schema with appropriate validation rules
+ */
 const authFormSchema = (type: FormType) => {
     return z.object({
       name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
@@ -27,11 +38,16 @@ const authFormSchema = (type: FormType) => {
     })
 }
 
+/**
+ * Authentication form component that handles both sign-in and sign-up
+ * @param type - Determines whether the form is for sign-in or sign-up
+ */
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   
   const formSchema = authFormSchema(type);
   
+  // Initialize form with React Hook Form and Zod validation
   const form = useForm<z.infer<typeof formSchema>>({  
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,6 +57,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
     },
   });
 
+  /**
+   * Form submission handler that processes authentication
+   * For sign-up: Creates Firebase account and stores user data
+   * For sign-in: Authenticates with Firebase and creates session
+   */
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try{
       if(type === "sign-up"){

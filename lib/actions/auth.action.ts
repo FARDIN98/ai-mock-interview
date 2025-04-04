@@ -1,11 +1,23 @@
+/**
+ * Authentication Server Actions
+ * 
+ * This file contains server-side functions for user authentication
+ * using Firebase Authentication and Firestore for user data storage.
+ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import {db, auth} from "@/firebase/admin";
 import {cookies} from "next/headers";
 
+// Session cookie duration (1 week)
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
+/**
+ * Creates a new user account in Firestore
+ * @param params - Object containing user details (uid, name, email)
+ * @returns Object with success status and message
+ */
 export async function signUp(params: SignUpParams) {
     const { uid, name, email } = params;
 
@@ -44,6 +56,11 @@ export async function signUp(params: SignUpParams) {
     }
 }
 
+/**
+ * Authenticates a user and creates a session cookie
+ * @param params - Object containing email and idToken from Firebase Auth
+ * @returns Object with success status and user data if successful
+ */
 export async function signIn(params: SignInParams) {
     const { email, idToken } = params;
 
@@ -68,6 +85,11 @@ export async function signIn(params: SignInParams) {
     }
 }
 
+/**
+ * Creates a session cookie for authenticated users
+ * @param idToken - Firebase authentication token
+ * Sets an HTTP-only cookie with the session information
+ */
 export async function setSessionCookie(idToken: string) {
     const cookieStore = await cookies();
 
@@ -84,6 +106,10 @@ export async function setSessionCookie(idToken: string) {
     })
 }
 
+/**
+ * Retrieves the currently authenticated user from the session cookie
+ * @returns User object if authenticated, null otherwise
+ */
 export async function getCurrentUser(): Promise<User | null> {
     const cookieStore = await cookies();
 
@@ -112,6 +138,10 @@ export async function getCurrentUser(): Promise<User | null> {
     }
 }
 
+/**
+ * Checks if a user is currently authenticated
+ * @returns Boolean indicating authentication status
+ */
 export async function isAuthenticated() {
     const user = await getCurrentUser();
 
