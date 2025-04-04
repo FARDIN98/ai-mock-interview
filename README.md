@@ -18,9 +18,10 @@
 1. 🤖 [Introduction](#introduction)
 2. ⚙️ [Tech Stack](#tech-stack)
 3. 🔋 [Features](#features)
-4. 🤸 [Quick Start](#quick-start)
-5. 🕸️ [Snippets (Code to Copy)](#snippets)
-6. 🔗 [Assets](#links)
+4. 🔄 [Data Flow](#data-flow)
+5. 🤸 [Quick Start](#quick-start)
+6. 🕸️ [Snippets](#snippets)
+7. 🔗 [Assets](#links)
 
 ## <a name="introduction">🤖 Introduction</a>
 
@@ -56,6 +57,46 @@ Built with Next.js for the user interface and backend logic, Firebase for authen
 👉 **Responsiveness**: Fully responsive design that works seamlessly across devices.
 
 and many more, including code architecture and reusability
+
+## <a name="data-flow">🔄 Data Flow</a>
+
+Prepwise's architecture follows a streamlined data flow that enables seamless interview preparation and feedback:
+
+### User Authentication Flow
+- **Sign Up/Sign In**: Firebase Authentication handles user credentials and session management
+- **User Data Storage**: User profiles and preferences are stored in Firebase Firestore
+- **Session Management**: Next.js server-side authentication maintains secure user sessions
+
+### Interview Creation Flow
+1. **User Input**: User selects job role, experience level, tech stack, and interview type
+2. **Question Generation**: 
+   - Request sent to Google Gemini AI via API
+   - AI generates relevant interview questions based on parameters
+   - Questions are formatted and stored in Firebase
+
+### Interview Execution Flow
+1. **Voice Interaction**:
+   - Vapi AI voice agent retrieves questions from Firebase
+   - Real-time voice conversation between user and AI interviewer
+   - Speech-to-text conversion of user responses
+
+2. **Transcript Processing**:
+   - Voice responses converted to text
+   - Complete interview transcript stored in Firebase
+
+### Feedback Generation Flow
+1. **Analysis**:
+   - Interview transcript sent to Google Gemini AI
+   - AI analyzes responses across multiple categories
+
+2. **Scoring and Recommendations**:
+   - AI generates scores for communication, technical knowledge, problem-solving, etc.
+   - Provides detailed feedback with strengths and areas for improvement
+   - Feedback stored in Firebase and linked to the interview
+
+### Data Persistence
+- All user data, interviews, and feedback are stored in Firebase Firestore
+- Secure access controls ensure users only access their own interview data
 
 ## <a name="quick-start">🤸 Quick Start</a>
 
