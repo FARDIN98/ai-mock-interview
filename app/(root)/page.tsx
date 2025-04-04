@@ -5,7 +5,7 @@
  * It displays a call-to-action section, the user's past interviews,
  * and available new interviews.
  */
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
 import React from 'react'
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
