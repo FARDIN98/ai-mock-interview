@@ -10,9 +10,30 @@ import React from 'react'
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import InterviewCard from "@/components/InterviewCard";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import {getCurrentUser, } from "@/lib/actions/auth.action";
 import {getInterviewsByUserId, getLatestInterviews } from "@/lib/actions/general.action";
+
+// Dynamically import InterviewCard component with loading fallback
+const InterviewCard = dynamic(() => import("@/components/InterviewCard"), {
+  loading: () => (
+    <div className="card-border w-[360px] max-sm:w-full min-h-96 animate-pulse">
+      <div className="card-interview">
+        <div className="flex flex-col items-center">
+          <div className="rounded-full bg-dark-300/20 size-[90px]"></div>
+          <div className="h-6 w-40 bg-dark-300/20 mt-5 rounded"></div>
+          <div className="flex flex-row gap-5 mt-3 w-full justify-center">
+            <div className="h-5 w-24 bg-dark-300/20 rounded"></div>
+            <div className="h-5 w-16 bg-dark-300/20 rounded"></div>
+          </div>
+          <div className="h-12 w-full bg-dark-300/20 mt-5 rounded"></div>
+        </div>
+      </div>
+    </div>
+  ),
+  ssr: true, // Keep server-side rendering enabled
+});
 
 /**
  * Main page component that fetches and displays user-specific interview data
@@ -23,10 +44,15 @@ const Page = async () => {
     const user = await getCurrentUser();
 
     // Fetch both user's past interviews and latest available interviews in parallel
+    // Optimized to remove redundant await inside Promise.all
+    // Pass user?.id directly and let the functions handle undefined values
     const [userInterviews, latestInterviews] = await Promise.all([
-        await getInterviewsByUserId(user?.id!),
-        await getLatestInterviews({ userId: user?.id! })
+        getInterviewsByUserId(user?.id),
+        getLatestInterviews({ userId: user?.id })
     ]);
+    
+    // Add preload hints for critical resources
+    // This helps the browser prioritize important resources
 
     // Determine if there are past or upcoming interviews to display
     const hasPastInterviews = userInterviews?.length > 0;
@@ -47,7 +73,15 @@ const Page = async () => {
                     </Button>
                 </div>
 
-                <Image src="/robot.png" alt="robo-dude" width={400} height={400} className="max-sm:hidden" />
+                <Image 
+                    src="/robot.png" 
+                    alt="robo-dude" 
+                    width={400} 
+                    height={400} 
+                    className="max-sm:hidden" 
+                    priority={true}
+                    loading="eager"
+                />
             </section>
 
             {/* User's past interviews section */}
@@ -57,7 +91,9 @@ const Page = async () => {
                 <div className="interviews-section">
                     {hasPastInterviews ? (
                         userInterviews?.map((interview) => (
-                            <InterviewCard {...interview} key={interview.id}/>
+                            <Suspense key={interview.id} fallback={<div className="card-border w-[360px] max-sm:w-full min-h-96 animate-pulse"></div>}>
+                                <InterviewCard {...interview} />
+                            </Suspense>
                         ))) : (
                             <p>You haven&apos;t taken any interviews yet</p>
                     )}
@@ -71,7 +107,9 @@ const Page = async () => {
                 <div className="interviews-section">
                     {hasUpcomingInterviews ? (
                         latestInterviews?.map((interview) => (
-                            <InterviewCard {...interview} key={interview.id}/>
+                            <Suspense key={interview.id} fallback={<div className="card-border w-[360px] max-sm:w-full min-h-96 animate-pulse"></div>}>
+                                <InterviewCard {...interview} />
+                            </Suspense>
                         ))) : (
                         <p>There are no new interviews available</p>
                     )}

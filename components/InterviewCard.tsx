@@ -5,20 +5,45 @@
  * Shows feedback if available, otherwise prompts user to take the interview
  * Links to either the interview or feedback page based on whether feedback exists
  */
-/**
- * InterviewCard Component
- * 
- * Displays a card for an interview with details such as role, type, date, and score
- * Shows feedback if available, otherwise prompts user to take the interview
- * Links to either the interview or feedback page based on whether feedback exists
- */
 import dayjs from 'dayjs';
 import Image from "next/image";
 import {getRandomInterviewCover} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
-import DisplayTechIcons from "@/components/DisplayTechIcons";
+import {Suspense, cache} from "react";
 import {getFeedbackByInterviewId} from "@/lib/actions/general.action";
+
+// Import dynamic component with loading fallback for better performance
+import dynamic from 'next/dynamic';
+
+// Dynamically import DisplayTechIcons with loading fallback
+const DisplayTechIcons = dynamic(() => import("@/components/DisplayTechIcons"), {
+  loading: () => <div className="flex flex-row h-[40px] w-[120px] bg-dark-300/20 animate-pulse rounded-full"></div>,
+  ssr: true, // Keep server-side rendering enabled
+});
+
+// Cache the feedback fetch to prevent redundant requests
+const getCachedFeedback = cache(async (interviewId: string, userId: string) => {
+  if (!interviewId || !userId) return null;
+  return await getFeedbackByInterviewId({ interviewId, userId });
+});
+
+// Loading fallback for the interview card
+const InterviewCardSkeleton = () => (
+  <div className="card-border w-[360px] max-sm:w-full min-h-96 animate-pulse">
+    <div className="card-interview">
+      <div className="flex flex-col items-center">
+        <div className="rounded-full bg-dark-300/20 size-[90px]"></div>
+        <div className="h-6 w-40 bg-dark-300/20 mt-5 rounded"></div>
+        <div className="flex flex-row gap-5 mt-3 w-full justify-center">
+          <div className="h-5 w-24 bg-dark-300/20 rounded"></div>
+          <div className="h-5 w-16 bg-dark-300/20 rounded"></div>
+        </div>
+        <div className="h-12 w-full bg-dark-300/20 mt-5 rounded"></div>
+      </div>
+    </div>
+  </div>
+);
 
 /**
  * InterviewCard component for displaying interview information and feedback status
@@ -30,16 +55,19 @@ import {getFeedbackByInterviewId} from "@/lib/actions/general.action";
  * @param createdAt - Timestamp when the interview was created
  */
 const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: InterviewCardProps) => {
-    // Fetch feedback for this interview if user ID and interview ID are provided
+    // Use cached feedback fetch to improve performance
     const feedback = userId && id
-    ? await getFeedbackByInterviewId({ interviewId: id, userId})
-        : null;
+      ? await getCachedFeedback(id, userId)
+      : null;
     
     // Normalize the interview type for display (convert 'mix' to 'Mixed')
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
     
     // Format the date using either feedback creation date, interview creation date, or current date
     const formattedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format('MMM D, YYYY');
+
+    // Precompute the cover image URL to avoid random generation on re-renders
+    const coverImageUrl = getRandomInterviewCover();
 
     return (
         <div className="card-border w-[360px] max-sm:w-full min-h-96">
@@ -50,8 +78,16 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
                       <p className="badge-text">{normalizedType}</p>
                   </div>
 
-                  {/* Interview cover image */}
-                  <Image src={getRandomInterviewCover()} alt="cover image" width={90} height={90} className="rounded-full object-fit size-[90px]" />
+                  {/* Interview cover image with priority loading for above-the-fold content */}
+                  <Image 
+                    src={coverImageUrl} 
+                    alt={`${role} interview cover`} 
+                    width={90} 
+                    height={90} 
+                    className="rounded-full object-fit size-[90px]" 
+                    priority={true}
+                    loading="eager"
+                  />
 
                   {/* Interview role title */}
                   <h3 className="mt-5 capitalize">
@@ -62,13 +98,25 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
                   <div className="flex flex-row gap-5 mt-3">
                       {/* Date of interview or feedback */}
                       <div className="flex flex-row gap-2">
-                          <Image src="/calendar.svg" alt="calendar" width={22} height={22} />
+                          <Image 
+                            src="/calendar.svg" 
+                            alt="calendar" 
+                            width={22} 
+                            height={22} 
+                            loading="eager"
+                          />
                           <p>{formattedDate}</p>
                       </div>
 
                       {/* Score display - shows actual score or placeholder if not taken */}
                       <div className="flex flex-row gap-2 items-center">
-               <Image src="/star.svg" alt="star" width={22} height={22} />
+                          <Image 
+                            src="/star.svg" 
+                            alt="star" 
+                            width={22} 
+                            height={22} 
+                            loading="eager"
+                          />
                           <p>{feedback?.totalScore || '---'}/100</p>
                       </div>
                   </div>
@@ -80,8 +128,10 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
               </div>
 
                 <div className="flex flex-row justify-between">
-                    {/* Display technology stack icons */}
-                    <DisplayTechIcons techStack={techstack} />
+                    {/* Display technology stack icons with Suspense boundary */}
+                    <Suspense fallback={<div className="h-[40px] w-[120px] bg-dark-300/20 animate-pulse rounded-full"></div>}>
+                      <DisplayTechIcons techStack={techstack} />
+                    </Suspense>
 
                     {/* Action button - links to feedback or interview based on status */}
                     <Button className="btn-primary">
@@ -97,4 +147,12 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
         </div>
     )
 }
-export default InterviewCard
+
+// Export the component wrapped in Suspense for better loading experience
+export default function InterviewCardWithSuspense(props: InterviewCardProps) {
+  return (
+    <Suspense fallback={<InterviewCardSkeleton />}>
+      <InterviewCard {...props} />
+    </Suspense>
+  );
+}

@@ -17,7 +17,12 @@ import {feedbackSchema} from "@/constants";
  * @param userId - The unique identifier of the user
  * @returns Promise resolving to an array of Interview objects or null
  */
-export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
+export async function getInterviewsByUserId(userId?: string): Promise<Interview[] | null> {
+    // If userId is undefined, return an empty array
+    if (!userId) {
+        return [];
+    }
+    
     // Query Firestore for interviews matching the user ID, sorted by creation date
     const interviews = await db
         .collection('interviews')
@@ -41,12 +46,19 @@ export async function getInterviewsByUserId(userId: string): Promise<Interview[]
 export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
     const { userId, limit = 20 } = params;
 
-    // Query Firestore for finalized interviews not created by the current user
-    const interviews = await db
+    // Base query for finalized interviews
+    let query = db
         .collection('interviews')
         .orderBy('createdAt', 'desc')        // Sort by creation date (newest first)
-        .where('finalized', '==', true)      // Only include finalized interviews
-        .where('userId', '!=', userId)       // Exclude current user's interviews
+        .where('finalized', '==', true);     // Only include finalized interviews
+    
+    // Only add the userId filter if userId is defined
+    if (userId) {
+        query = query.where('userId', '!=', userId); // Exclude current user's interviews
+    }
+    
+    // Execute the query with limit
+    const interviews = await query
         .limit(limit)                        // Limit the number of results
         .get();
 

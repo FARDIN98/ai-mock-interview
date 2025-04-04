@@ -50,25 +50,47 @@ const checkIconExists = async (url: string) => {
  * Fetches technology logos for an array of technology names
  * Maps each technology to its corresponding icon URL and verifies existence
  * Falls back to a default icon if the specific technology icon doesn't exist
+ * Implements caching to prevent redundant network requests
  * @param techArray - Array of technology names to fetch logos for
  * @returns Promise resolving to an array of objects with tech names and their icon URLs
  */
+
+// Cache for storing tech logo URLs to avoid redundant network requests
+const techLogoCache = new Map<string, string>();
+
 export const getTechLogos = async (techArray: string[]) => {
   // Map each technology to its potential icon URL
   const logoURLs = techArray.map((tech) => {
     const normalized = normalizeTechName(tech);
     return {
       tech,
+      normalized,
       url: `${techIconBaseURL}/${normalized}/${normalized}-original.svg`,
     };
   });
 
   // Check if each icon exists and fall back to default if needed
   const results = await Promise.all(
-    logoURLs.map(async ({ tech, url }) => ({
-      tech,
-      url: (await checkIconExists(url)) ? url : "/tech.svg",
-    }))
+    logoURLs.map(async ({ tech, normalized, url }) => {
+      // Check if the URL is already in the cache
+      if (techLogoCache.has(normalized)) {
+        return {
+          tech,
+          url: techLogoCache.get(normalized)!,
+        };
+      }
+      
+      // If not in cache, check if the icon exists
+      const finalUrl = (await checkIconExists(url)) ? url : "/tech.svg";
+      
+      // Store in cache for future use
+      techLogoCache.set(normalized, finalUrl);
+      
+      return {
+        tech,
+        url: finalUrl,
+      };
+    })
   );
 
   return results;
