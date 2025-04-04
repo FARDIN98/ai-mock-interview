@@ -19,7 +19,8 @@
 2. ⚙️ [Tech Stack](#tech-stack)
 3. 🔋 [Features](#features)
 4. 🔄 [Data Flow](#data-flow)
-5. 🤸 [Quick Start](#quick-start)
+5. ⚡ [Performance Optimization](#performance)
+6. 🤸 [Quick Start](#quick-start)
 6. 🕸️ [Snippets](#snippets)
 7. 🔗 [Assets](#links)
 
@@ -97,6 +98,32 @@ Prepwise's architecture follows a streamlined data flow that enables seamless in
 ### Data Persistence
 - All user data, interviews, and feedback are stored in Firebase Firestore
 - Secure access controls ensure users only access their own interview data
+
+## <a name="performance">⚡ Performance Optimization</a>
+
+Prepwise implements several performance optimization techniques to ensure a fast, responsive user experience:
+
+### Code Splitting & Lazy Loading
+- **Dynamic Imports**: Components like `InterviewCard` and `DisplayTechIcons` are loaded dynamically using Next.js's dynamic import functionality
+- **Suspense Boundaries**: React Suspense is used throughout the application to provide smooth loading states while components or data are being fetched
+
+### Image Optimization
+- **Next.js Image Component**: All images use the optimized Image component with proper sizing, formats, and loading priorities
+- **Priority Loading**: Critical above-the-fold images use the `priority` attribute to ensure they load first
+- **Eager Loading**: Important UI elements use `loading="eager"` to improve perceived performance
+
+### Data Fetching
+- **Parallel Data Fetching**: `Promise.all` is used to fetch multiple data sources simultaneously (e.g., user interviews and latest interviews)
+- **Data Caching**: Functions like `getCachedFeedback` implement caching to prevent redundant API calls
+
+### Component Optimization
+- **Skeleton Loading**: Custom skeleton loaders provide visual feedback during component loading
+- **Conditional Rendering**: Components only render when necessary based on data availability
+- **Optimized Rendering**: Careful management of component re-renders with proper key usage in lists
+
+### Resource Prioritization
+- **Critical CSS**: Important styles are inlined to reduce render-blocking resources
+- **Asset Preloading**: Key assets are preloaded to improve initial page load performance
 
 ## <a name="quick-start">🤸 Quick Start</a>
 
