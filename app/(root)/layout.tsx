@@ -1,4 +1,5 @@
-import { isAuthenticated } from '@/lib/actions/auth.action'
+import { isAuthenticated, signOut } from '@/lib/actions/auth.action'
+import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -13,11 +14,16 @@ const RootLayout = async ({children} : {children: ReactNode}) => {
   return (
     <div>
       <div className="root-layout">
-        <nav>
+        <nav className="flex justify-between items-center w-full">
           <Link href="/" className='flex items-center gap-2' >
             <Image src="/logo.svg" alt="logo" width={38} height={32} />
             <h2 className='text-primary-100 font-bold'>PrepWise</h2>
           </Link>
+          <form action={signOut}>
+            <Button type="submit" variant="outline" className="btn-secondary max-sm:px-3 max-sm:text-sm">
+              Logout
+            </Button>
+          </form>
         </nav>
 
         {children}

@@ -147,3 +147,25 @@ export async function isAuthenticated() {
 
     return !!user;
 }
+
+/**
+ * Logs out the current user by clearing the session cookie
+ * @returns Object with success status and message
+ */
+export async function signOut() {
+    const cookieStore = await cookies();
+    
+    // Delete the session cookie by setting maxAge to 0
+    cookieStore.set('session', '', {
+        maxAge: 0,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        sameSite: 'lax'
+    });
+
+    return {
+        success: true,
+        message: 'Logged out successfully'
+    };
+}
