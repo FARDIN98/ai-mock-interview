@@ -19,7 +19,7 @@ const ONE_WEEK = 60 * 60 * 24 * 7;
  * @returns Object with success status and message
  */
 export async function signUp(params: SignUpParams) {
-    const { uid, name, email } = params;
+    const { uid, name, email, photoURL } = params;
 
     try {
         const userRecord = await db.collection('users').doc(uid).get();
@@ -32,7 +32,7 @@ export async function signUp(params: SignUpParams) {
         }
 
         await db.collection('users').doc(uid).set({
-            name, email
+            name, email, photoURL
         })
 
         return {

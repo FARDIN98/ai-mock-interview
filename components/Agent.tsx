@@ -40,8 +40,18 @@ interface SavedMessage {
  * @param type - Type of interaction ('generate' for question generation, 'interview' for actual interview)
  * @param interviewId - ID of the interview being conducted
  * @param questions - Array of questions for the interview
+ * @param photoURL - URL of the user's profile photo
  */
-const Agent = ({ userName, userId, type, interviewId, questions }: AgentProps) => {
+interface AgentProps {
+  userName?: string;
+  userId?: string;
+  type: 'generate' | 'interview';
+  interviewId?: string;
+  questions?: string[];
+  photoURL?: string;
+}
+
+const Agent = ({ userName, userId, type, interviewId, questions, photoURL }: AgentProps) => {
     const router = useRouter();
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -212,7 +222,13 @@ const Agent = ({ userName, userId, type, interviewId, questions }: AgentProps) =
             {/* User information display */}
             <div className="card-border">
                 <div className="card-content">
-                    <Image src="/user-avatar.png" alt="user avatar" width={540} height={540} className="rounded-full object-cover size-[120px]" />
+                    <Image 
+                        src={photoURL && photoURL.length > 0 ? photoURL : "/user-avatar.png"} 
+                        alt="user avatar" 
+                        width={540} 
+                        height={540} 
+                        className="rounded-full object-cover size-[120px]" 
+                    />
                     <h3>{userName}</h3>
                 </div>
             </div>

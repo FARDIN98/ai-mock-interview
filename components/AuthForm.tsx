@@ -128,6 +128,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           name: userCredential.user.displayName || 'User',
           email: userCredential.user.email!,
           password: '', // Password not needed for Google auth
+          photoURL: userCredential.user.photoURL || '', // Get profile picture URL from Google account
         });
       }
       
