@@ -20,7 +20,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { signUp, signIn } from "@/lib/actions/auth.action";
 
@@ -97,12 +97,50 @@ const AuthForm = ({ type }: { type: FormType }) => {
         })
 
         toast.success('Sign in successfully.');
-        router.push('/');
+        router.push('/dashboard');
         console.log('SIGN IN', values)
       }
     } catch(error) {
       console.log(error)
       toast.error(`There was an error: ${error}`);
+    }
+  }
+
+  /**
+   * Google sign-in handler that authenticates with Firebase
+   * Uses GoogleAuthProvider and signInWithPopup for one-click authentication
+   */
+  async function signInWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const idToken = await userCredential.user.getIdToken();
+      
+      if(!idToken) {
+        toast.error('Google sign-in failed');
+        return;
+      }
+      
+      // If it's a new user, create an account in Firestore
+      if(userCredential.user.metadata.creationTime === userCredential.user.metadata.lastSignInTime) {
+        await signUp({
+          uid: userCredential.user.uid,
+          name: userCredential.user.displayName || 'User',
+          email: userCredential.user.email!,
+          password: '', // Password not needed for Google auth
+        });
+      }
+      
+      await signIn({
+        email: userCredential.user.email!,
+        idToken
+      });
+      
+      toast.success('Signed in successfully with Google');
+      router.push('/dashboard');
+    } catch (error) {
+      console.log(error);
+      toast.error(`Google sign-in error: ${error}`);
     }
   }
 
@@ -150,6 +188,21 @@ const AuthForm = ({ type }: { type: FormType }) => {
             </Button>
           </form>
         </Form>
+        
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <div className="h-px bg-gray-300 flex-1"></div>
+          <span className="text-sm text-gray-400">OR</span>
+          <div className="h-px bg-gray-300 flex-1"></div>
+        </div>
+        
+        <Button 
+          type="button" 
+          className="!w-full !bg-primary-200 !text-dark-100 hover:!bg-primary-200/80 !rounded-full !min-h-10 !font-bold !px-5 cursor-pointer" 
+          onClick={signInWithGoogle}
+        >
+          <Image src="/google.svg" alt="Google" width={20} height={20} />
+          <span>Sign in with Google</span>
+        </Button>
 
         <p className="text-center text-primary-100">
           {isSignIn

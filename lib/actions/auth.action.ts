@@ -120,12 +120,13 @@ export async function getCurrentUser(): Promise<User | null> {
     try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
-        const userRecord = await db.
-            collection('users')
+        const userRecord = await db
+            .collection('users')
             .doc(decodedClaims.uid)
-            .get();
+            .get()
+            .catch(() => null);
 
-        if(!userRecord.exists) return null;
+        if(!userRecord?.exists) return null;
 
         return {
             ...userRecord.data(),
