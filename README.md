@@ -43,7 +43,7 @@ Built with Next.js for the user interface and backend logic, Firebase for authen
 
 ## <a name="features">🔋 Features</a>
 
-👉 **Authentication**: Sign Up and Sign In using password/email authentication handled by Firebase.
+👉 **Authentication**: Sign Up and Sign In using password/email & Google authentication handled by Firebase.
 
 👉 **Create Interviews**: Easily generate job interviews with help of Vapi voice assistants and Google Gemini.
 
@@ -52,6 +52,8 @@ Built with Next.js for the user interface and backend logic, Firebase for authen
 👉 **Modern UI/UX**: A sleek and user-friendly interface designed for a great experience.
 
 👉 **Interview Page**: Conduct AI-driven interviews with real-time feedback and detailed transcripts.
+
+👉 **Progressive Web App (PWA)**: Install the app on your device for offline access, faster loading times, and a native-like experience.
 
 👉 **Dashboard**: Manage and track all your interviews with easy navigation.
 
