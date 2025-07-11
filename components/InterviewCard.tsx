@@ -134,7 +134,7 @@ const InterviewCard = async ({ id, userId, role, type, techstack, createdAt }: I
                     </Suspense>
 
                     {/* Action button - links to feedback or interview based on status */}
-                    <Button className="btn-primary">
+                    <Button asChild className="btn-primary">
                         <Link href={feedback
                             ? `/interview/${id}/feedback`  // If feedback exists, link to feedback page
                             : `/interview/${id}`           // If no feedback, link to interview page
