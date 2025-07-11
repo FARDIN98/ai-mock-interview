@@ -41,6 +41,7 @@ Built with Next.js for the user interface and backend logic, Firebase for authen
 - shadcn/ui
 - Google Gemeni
 - Zod
+- Jest
 
 ## <a name="features">🔋 Features</a>
 
@@ -104,7 +105,7 @@ Prepwise's architecture follows a streamlined data flow that enables seamless in
 
 ## <a name="testing">🧪 Testing Strategy & Results</a>
 
-Prepwise implements comprehensive testing to ensure reliability, performance, and code quality across all components and features.
+Prepwise implements comprehensive testing to ensure reliability, performance, and code quality across all components and features using Jest.
 
 ### Testing Approach
 
