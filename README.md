@@ -161,8 +161,6 @@ Prepwise implements comprehensive testing to ensure reliability, performance, an
 - **Testing Library**: React Testing Library for component testing
 - **Environment**: jsdom for browser simulation
 - **Mocking**: Jest mocks for external services
-- **Coverage**: Automated coverage collection
-- **CI/CD**: Automated testing on code changes
 
 ## <a name="performance">⚡ Performance Optimization</a>
 
