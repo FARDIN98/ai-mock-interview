@@ -268,28 +268,30 @@ Prepwise is fully containerized and ready for production deployment using Docker
 **Option 1: Pull from Docker Hub (Recommended)**
 
 ```bash
-# Pull the latest image
 docker pull fardin98/ai-mock-interview:latest
+```
 
-# Run the container
+```bash
 docker run -p 3000:3000 fardin98/ai-mock-interview:latest
 ```
 
 **Option 2: Build Locally**
 
 ```bash
-# Clone the repository
 git clone https://github.com/FARDIN98/ai-mock-interview
-cd ai-mock-interview
+```
 
-# Build and run with Docker Compose
+```bash
+cd ai-mock-interview
+```
+
+```bash
 docker-compose up --build
 ```
 
 **Option 3: Development with Docker**
 
 ```bash
-# Run development container with hot-reload
 docker-compose -f docker-compose.yml up --build
 ```
 
