@@ -22,8 +22,9 @@
 5. 🧪 [Testing Strategy & Results](#testing)
 6. ⚡ [Performance Optimization](#performance)
 7. 🤸 [Quick Start](#quick-start)
-8. 🕸️ [Snippets](#snippets)
-9. 🔗 [Assets](#links)
+8. 🐳 [Docker Deployment](#docker)
+9. 🕸️ [Snippets](#snippets)
+10. 🔗 [Assets](#links)
 
 ## <a name="introduction">🤖 Introduction</a>
 
@@ -249,6 +250,70 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to view the project.
+
+## <a name="docker">🐳 Docker Deployment</a>
+
+Prepwise is fully containerized and ready for production deployment using Docker. The project includes comprehensive Docker support with multi-stage builds, development containers, and production-ready configurations.
+
+### Docker Features
+
+- **Multi-stage Dockerfile**: Optimized production builds with minimal image size
+- **Development Container**: Hot-reload enabled development environment
+- **Docker Compose**: Complete orchestration with volume management
+- **Docker Hub**: Pre-built images available for instant deployment
+- **Volume Management**: Persistent data storage and backup solutions
+
+### Quick Docker Setup
+
+**Option 1: Pull from Docker Hub (Recommended)**
+
+```bash
+# Pull the latest image
+docker pull fardin98/ai-mock-interview:latest
+
+# Run the container
+docker run -p 3000:3000 fardin98/ai-mock-interview:latest
+```
+
+**Option 2: Build Locally**
+
+```bash
+# Clone the repository
+git clone https://github.com/FARDIN98/ai-mock-interview
+cd ai-mock-interview
+
+# Build and run with Docker Compose
+docker-compose up --build
+```
+
+**Option 3: Development with Docker**
+
+```bash
+# Run development container with hot-reload
+docker-compose -f docker-compose.yml up --build
+```
+
+
+### Environment Variables for Docker
+
+Create a `.env.local` file with the same variables as mentioned in the Quick Start section. The Docker containers will automatically load these environment variables.
+
+### Docker Hub Repository
+
+The project is available on Docker Hub: [fardin98/ai-mock-interview](https://hub.docker.com/r/fardin98/ai-mock-interview)
+
+
+
+### Volume Management
+
+The project includes comprehensive volume management for:
+- Application data persistence
+- Log file storage
+- Backup and restore capabilities
+- SSL certificate storage
+- Upload file management
+
+For detailed Docker documentation, see [DOCKER_README.md](DOCKER_README.md)
 
 ## <a name="snippets">🕸️ Snippets</a>
 

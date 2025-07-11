@@ -40,7 +40,7 @@ const initFirebaseAdmin = () => {
                 projectId: process.env.FIREBASE_PROJECT_ID,
                 clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
                 // Replace escaped newlines with actual newlines in the private key
-                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n")
             })
         })
     }

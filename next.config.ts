@@ -18,6 +18,8 @@ const turbopackConfig = {
 };
 
 const config: NextConfig = {
+  // Enable standalone output for Docker
+  output: 'standalone',
   // Enable experimental features for Turbopack
   experimental: {
     // Enable Turbopack for faster development builds

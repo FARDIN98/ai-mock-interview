@@ -1,0 +1,165 @@
+version: '3.8'
+
+services:
+  ai-mock-interview:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+        - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+        - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+        - NEXT_PUBLIC_VAPI_WEB_TOKEN=${NEXT_PUBLIC_VAPI_WEB_TOKEN}
+        - NEXT_PUBLIC_VAPI_WORKFLOW_ID=${NEXT_PUBLIC_VAPI_WORKFLOW_ID}
+        - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+        - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+        - NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+        - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+        - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+        - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+        - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+        - NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_VAPI_WEB_TOKEN=${NEXT_PUBLIC_VAPI_WEB_TOKEN}
+      - NEXT_PUBLIC_VAPI_WORKFLOW_ID=${NEXT_PUBLIC_VAPI_WORKFLOW_ID}
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+      - NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+      - NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+    volumes:
+      # Application data persistence
+      - app_data:/app/data
+      - app_uploads:/app/public/uploads
+      - app_logs:/app/logs
+      # Build cache for faster rebuilds
+      - next_cache:/app/.next
+      # Database backups (if using local DB)
+      - db_backups:/app/backups
+      # SSL certificates (for production)
+      - ssl_certs:/app/ssl
+    restart: unless-stopped
+    container_name: ai-mock-interview-app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development service (optional)
+  ai-mock-interview-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"
+    volumes:
+      # Source code hot reload
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      # Development data persistence
+      - dev_data:/app/data
+      - dev_uploads:/app/public/uploads
+      - dev_logs:/app/logs
+      # Package manager cache
+      - npm_cache:/root/.npm
+      - yarn_cache:/usr/local/share/.cache/yarn
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_VAPI_WEB_TOKEN=${NEXT_PUBLIC_VAPI_WEB_TOKEN}
+      - NEXT_PUBLIC_VAPI_WORKFLOW_ID=${NEXT_PUBLIC_VAPI_WORKFLOW_ID}
+      - GOOGLE_GENERATIVE_AI_API_KEY=${GOOGLE_GENERATIVE_AI_API_KEY}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3001
+      - NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+      - NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+    restart: unless-stopped
+    container_name: ai-mock-interview-dev
+    profiles:
+      - dev
+
+# Named volumes for data persistence
+volumes:
+  # Production volumes
+  app_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/app_data
+  
+  app_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/uploads
+  
+  app_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/logs
+  
+  next_cache:
+    driver: local
+  
+  db_backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/backups
+  
+  ssl_certs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/ssl
+  
+  # Development volumes
+  dev_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/dev_data
+  
+  dev_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/dev_uploads
+  
+  dev_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes/dev_logs
+  
+  npm_cache:
+    driver: local
+  
+  yarn_cache:
+    driver: local
